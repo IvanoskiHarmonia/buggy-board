@@ -1,0 +1,50 @@
+{
+  "profile": {
+    "fullName": "Halle QA Learner",
+    "email": "halle@example.com",
+    "city": "Austin",
+    "goal": "Become a manual QA tester"
+  },
+  "jobs": [
+    {
+      "id": "8738e472-b396-4c5e-b4e0-9dde40a1ad2f",
+      "company": "LinkedIn",
+      "role": "Manual QA Tester",
+      "status": "Applied",
+      "dateApplied": "2026-06-01",
+      "notes": "Just a test :D"
+    },
+    {
+      "id": "job-1",
+      "company": "Google",
+      "role": "Manual QA Tester",
+      "status": "Applied",
+      "dateApplied": "2026-05-01",
+      "notes": "Practice example for testing search and status filters."
+    },
+    {
+      "id": "job-2",
+      "company": "Meta",
+      "role": "QA Analyst",
+      "status": "Interview",
+      "dateApplied": "2026-05-03",
+      "notes": "Good record for editing tests."
+    },
+    {
+      "id": "job-3",
+      "company": "Netflix",
+      "role": "Software QA Intern",
+      "status": "Rejected",
+      "dateApplied": "2026-05-06",
+      "notes": "Good record for rejected filter tests."
+    },
+    {
+      "id": "job-4",
+      "company": "Apple",
+      "role": "QA Specialist",
+      "status": "Offer",
+      "dateApplied": "2026-05-08",
+      "notes": "Good record for reports tests."
+    }
+  ]
+}

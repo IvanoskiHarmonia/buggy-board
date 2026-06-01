@@ -1,0 +1,10 @@
+Test Case ID,Feature,Precondition,Steps,Expected Result,Actual Result,Status,Notes
+TC-001,Login,App is open,Enter valid email and password then click Log In,User should log in successfully,,, 
+TC-002,Login,App is open,Enter valid email and one-character password then click Log In,User should see password validation error,,, 
+TC-003,Add Job,User is logged in,Leave company blank and enter role then click Add Job,Company required error should appear,,, 
+TC-004,Search,Jobs exist,Search for google in lowercase,Google job should appear,,, 
+TC-005,Filter,Jobs exist,Select Rejected status filter,Only rejected jobs should appear,,, 
+TC-006,Delete,At least two jobs exist,Delete the second job,The second job should be removed,,, 
+TC-007,Export,User is on Job Tracker,Click Export CSV,Success should show only if API succeeds,,, 
+TC-008,Profile,User is logged in,Change full name and save,Full name should update and persist,,, 
+TC-009,Reports,Jobs exist,Compare report counts with job list,Counts should match job list,,, 

@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+jspm_packages/
+web_modules/
+
+# Production Build Outputs
+dist/
+build/
+out/
+.next/
+
+# Local Environment Variables and Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Diagnostic and Coverage reports
+coverage/
+.nyc_output/
+
+# IDEs and Text Editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Operating System Files
+.DS_Store
+Thumbs.db
