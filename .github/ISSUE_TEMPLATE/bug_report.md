@@ -1,8 +1,14 @@
-# Bug Report
+---
+name: Bug Fix
+about: Create a report to help us improve and fix software defects.
+title: '[BUG]: '
+labels: Bug
+assignees: 'ivanoskiHarmonia'
+---
 
-## Bug Title
+## Bug Description
 
-Short clear title.
+A clear and concise description of what the bug is.
 
 ## Environment
 
