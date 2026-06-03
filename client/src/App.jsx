@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BUGS } from './bugFlags.js';
 import LoginPage from './components/LoginPage.jsx';
 import JobTracker from './components/JobTracker.jsx';
 import ProfilePage from './components/ProfilePage.jsx';
@@ -36,7 +37,7 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${BUGS.accessibilityBugs ? ' a11y-bugs' : ''}`}>
       <header className="topbar">
         <div>
           <p className="eyebrow">QA Practice App</p>
@@ -44,7 +45,23 @@ export default function App() {
         </div>
 
         <div className="topbar-actions">
-          <span className="user-pill">{user.email}</span>
+          {/* BUG-014: no aria-label when accessibilityBugs is on */}
+          <button
+            type="button"
+            className="secondary-button icon-button"
+            {...(BUGS.accessibilityBugs ? {} : { 'aria-label': 'Notifications' })}
+          >
+            🔔
+          </button>
+          <span className="user-pill">
+            {/* BUG-014: img with no alt attribute when accessibilityBugs is on */}
+            <img
+              src="/avatar.svg"
+              className="user-avatar"
+              {...(BUGS.accessibilityBugs ? {} : { alt: 'User avatar' })}
+            />
+            {user.email}
+          </span>
           <button type="button" className="secondary-button" onClick={handleResetData}>
             Reset Demo Data
           </button>

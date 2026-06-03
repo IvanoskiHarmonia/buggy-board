@@ -1,7 +1,15 @@
 export const BUGS = {
-  caseSensitiveSearch: true,
-  rejectedFilterShowsOffers: true,
-  exportShowsSuccessEvenWhenApiFails: true,
-  profileSendsWrongFieldName: true,
-  helpButtonLogsConsoleError: true
+	caseSensitiveSearch: true,
+	rejectedFilterShowsOffers: true,
+	exportShowsSuccessEvenWhenApiFails: true,
+	profileSendsWrongFieldName: true,
+	helpButtonLogsConsoleError: true,
+	allowDuplicateSubmit: true,
+	accessibilityBugs: true,
+	layoutBreaksOnMobile: true,
+	exportSpinnerNeverStops: true,
+	genericErrorMessages: true,
+	sortIgnoresDirection: true,
+	regressionFilterBreaks: true,
+	paginationAlwaysShowsFirstPage: true,
 };

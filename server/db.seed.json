@@ -2,6 +2,7 @@
   "profile": {
     "fullName": "Halle QA Learner",
     "email": "halle@example.com",
+    "password": "Password123!",
     "city": "Austin",
     "goal": "Become a manual QA tester"
   },
@@ -37,6 +38,22 @@
       "status": "Offer",
       "dateApplied": "2026-05-08",
       "notes": "Good record for reports tests."
+    },
+    {
+      "id": "job-5",
+      "company": "Spotify",
+      "role": "QA Engineer",
+      "status": "Applied",
+      "dateApplied": "2026-04-20",
+      "notes": "Good record for pagination and sort tests."
+    },
+    {
+      "id": "job-6",
+      "company": "Airbnb",
+      "role": "Manual QA Tester",
+      "status": "Rejected",
+      "dateApplied": "2026-04-15",
+      "notes": "Good record for pagination and filter tests."
     }
   ]
 }

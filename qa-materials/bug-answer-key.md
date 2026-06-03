@@ -109,3 +109,126 @@ Use this only as the teacher/reference sheet. Do not give it to the learner at t
 - Actual: Rejected count matches Offer count.
 - Useful tools: Functional testing, data comparison, Network response.
 - Root cause: `server/server.js` uses offer count for rejected count when `rejectedReportUsesOfferCount` is true.
+
+## BUG-010: Edit job appears saved but reverts on refresh
+
+- Area: Job Tracker edit
+- Steps:
+  1. Click Edit on any job.
+  2. Change the role or notes field.
+  3. Click Save Changes. Note the success message.
+  4. Navigate to Profile, then back to Job Tracker.
+- Expected: The updated job should still show the new values.
+- Actual: The job reverts to its original values.
+- Useful tools: Network tab (response looks correct), then page navigation to see the revert.
+- Root cause: `server/server.js` returns the updated job without writing to the database when `editDoesNotPersist` is true.
+
+## BUG-011: Double-clicking Add Job creates duplicate entries
+
+- Area: Job Tracker add
+- Steps:
+  1. Fill in a company and role.
+  2. Double-click the Add Job button quickly.
+- Expected: Only one job should be created.
+- Actual: Two identical jobs are added.
+- Useful tools: Network tab (two POST requests fire), job list count before and after.
+- Root cause: The submit button has no disabled state during submission when `allowDuplicateSubmit` is true.
+
+## BUG-012: Adding a job returns wrong HTTP status code
+
+- Area: Job Tracker add
+- Steps:
+  1. Open Network tab before adding a job.
+  2. Fill in company and role, then click Add Job.
+  3. Find the POST /api/jobs request in Network tab.
+  4. Check the response status code.
+- Expected: A successful resource creation should return status 201 Created.
+- Actual: The response returns status 200 OK instead of 201 Created.
+- Useful tools: Network tab, response status code column.
+- Root cause: `server/server.js` returns status 200 instead of 201 when `wrongStatusCodeOnCreate` is true.
+
+## BUG-013: Pagination page 2 shows the same jobs as page 1
+
+- Area: Job Tracker pagination
+- Steps:
+  1. On the Job Tracker, note the 3 jobs shown on page 1.
+  2. Click Next → to go to page 2.
+  3. Compare the job list on page 2 with page 1.
+- Expected: Page 2 should show different jobs (the next set).
+- Actual: Page 2 shows the exact same jobs as page 1. The page indicator says "Page 2" but the content is the same.
+- Useful tools: Functional testing, visual comparison, test cases.
+- Root cause: `client/src/components/JobTracker.jsx` always uses page 1 offset when `paginationAlwaysShowsFirstPage` is true.
+
+## BUG-014: Accessibility violations in the header
+
+- Area: App header (topbar)
+- Steps:
+  1. Open Lighthouse in Chrome DevTools.
+  2. Run an Accessibility audit.
+  3. Also open the Elements tab and inspect the notification bell button and the avatar image.
+- Expected: All interactive elements should have accessible names. All images should have alt text. Text should meet WCAG contrast requirements.
+- Actual: The 🔔 button has no aria-label, the avatar img has no alt attribute, and the eyebrow text has insufficient color contrast.
+- Useful tools: Lighthouse Accessibility audit, axe DevTools, Elements tab.
+- Root cause: `client/src/App.jsx` omits aria-label and alt attributes when `accessibilityBugs` is true. `styles.css` applies low-contrast color via `.a11y-bugs .eyebrow`.
+
+## BUG-015: Layout breaks and causes horizontal scrolling on mobile
+
+- Area: Job Tracker layout
+- Steps:
+  1. Open DevTools and activate responsive/device mode.
+  2. Set the viewport width to 375px (iPhone size).
+  3. Observe the Job Tracker page layout.
+- Expected: The layout should collapse to a single column and fit within the viewport.
+- Actual: The content overflows horizontally and the page requires horizontal scrolling.
+- Useful tools: Elements tab, responsive/device toolbar, Lighthouse layout checks.
+- Root cause: `client/src/components/JobTracker.jsx` applies `minWidth: 900` inline style when `layoutBreaksOnMobile` is true, preventing the responsive layout from collapsing.
+
+## BUG-016: Export CSV spinner never stops
+
+- Area: Export CSV button
+- Steps:
+  1. Click Export CSV.
+  2. Wait for the request to complete (check Network tab).
+  3. Observe the Export CSV button after the response is received.
+- Expected: The button should return to its normal state after the export completes or fails.
+- Actual: The button remains in "Exporting..." state permanently and stays disabled. No further exports can be triggered.
+- Useful tools: Network tab (confirm request completed), functional testing (try clicking again).
+- Root cause: `client/src/components/JobTracker.jsx` never resets `isExporting` to false when `exportSpinnerNeverStops` is true.
+
+## BUG-017: All error messages show a generic message
+
+- Area: Login, Job Tracker
+- Steps:
+  1. On the login page, enter a wrong password.
+  2. Note the error message shown.
+  3. In Job Tracker, attempt to add a job with an invalid field.
+  4. Compare the error messages to what the API actually returns.
+- Expected: Error messages should reflect the actual server response (e.g., "Invalid email or password." for a 401).
+- Actual: All errors show "Server error. Please try again." regardless of the real error.
+- Useful tools: Network tab (check actual response body), compare UI error to API message.
+- Root cause: `client/src/components/LoginPage.jsx` and `JobTracker.jsx` replace real error messages with a generic string when `genericErrorMessages` is true.
+
+## BUG-018: Sort direction is always oldest first
+
+- Area: Job Tracker sort
+- Steps:
+  1. Note the jobs listed and their dates.
+  2. The sort dropdown shows "Newest first" (the default).
+  3. Confirm the order is not newest first — it's oldest first.
+  4. Change the dropdown to "Oldest first". Observe that nothing changes.
+- Expected: "Newest first" should show the most recently applied job at the top. "Oldest first" should show the earliest.
+- Actual: Both options always show jobs oldest first.
+- Useful tools: Functional testing, comparing dateApplied values across the visible list.
+- Root cause: `client/src/components/JobTracker.jsx` ignores the sort direction selection and always sorts ascending when `sortIgnoresDirection` is true.
+
+## BUG-019: Regression — typing in search resets the status filter
+
+- Area: Job Tracker search + filter
+- Steps:
+  1. Select the "Applied" status filter. Confirm only Applied jobs are shown.
+  2. Now type any character into the search box.
+  3. Observe the status filter dropdown and the job list.
+- Expected: The status filter should stay as "Applied" while searching.
+- Actual: The status filter resets to "All statuses" as soon as you type in the search box, showing all jobs regardless of the previously selected filter.
+- Useful tools: Functional testing, regression test cases, observing filter state while typing.
+- Root cause: `client/src/components/JobTracker.jsx` calls `setStatusFilter('All')` inside the search onChange handler when `regressionFilterBreaks` is true — a developer introduced this while modifying the search logic.

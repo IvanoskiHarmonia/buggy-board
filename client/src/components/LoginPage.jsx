@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BUGS } from '../bugFlags.js';
 import { login } from '../api.js';
 
 export default function LoginPage({ onLogin }) {
@@ -16,7 +17,7 @@ export default function LoginPage({ onLogin }) {
       const result = await login({ email, password });
       onLogin(result.user);
     } catch (err) {
-      setError(`${err.status || ''} ${err.message}`.trim());
+      setError(BUGS.genericErrorMessages ? 'Server error. Please try again.' : `${err.status || ''} ${err.message}`.trim());
     } finally {
       setIsSubmitting(false);
     }
@@ -47,7 +48,11 @@ export default function LoginPage({ onLogin }) {
             onChange={(event) => setPassword(event.target.value)}
             placeholder="At least 8 characters"
           />
-          <small className="muted-text">Expected rule: password should be at least 8 characters.</small>
+          <small className="muted-text">Expected rule: password should be at least 8 characters,<br></br>
+              at least 1 capital letter,<br></br>
+              1 lowercase letter,<br></br>
+              1 number and<br></br>
+              1 special character(e.g., !@#$%^&*)</small>
 
           {error && <div className="notice error">{error}</div>}
 
