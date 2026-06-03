@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { BUGS } from '../bugFlags.js';
 import { createJob, deleteJob, exportJobs, getJobs, updateJob } from '../api.js';
 
+const PAGE_SIZE = 3;
+
 const emptyForm = {
   company: '',
   role: '',
@@ -18,13 +20,21 @@ export default function JobTracker() {
   const [editingId, setEditingId] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [sortDirection, setSortDirection] = useState('newest');
+  const [currentPage, setCurrentPage] = useState(1);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     loadJobs();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchText, statusFilter, sortDirection]);
 
   async function loadJobs() {
     setIsLoading(true);
@@ -34,7 +44,7 @@ export default function JobTracker() {
       const data = await getJobs();
       setJobs(data);
     } catch (err) {
-      setError(`${err.status || ''} ${err.message}`.trim());
+      setError(BUGS.genericErrorMessages ? 'Server error. Please try again.' : `${err.status || ''} ${err.message}`.trim());
     } finally {
       setIsLoading(false);
     }
@@ -57,6 +67,11 @@ export default function JobTracker() {
       return;
     }
 
+    if (!BUGS.allowDuplicateSubmit) {
+      if (isSubmitting) return;
+      setIsSubmitting(true);
+    }
+
     try {
       if (editingId) {
         const updatedJob = await updateJob(editingId, form);
@@ -71,7 +86,11 @@ export default function JobTracker() {
       setForm(emptyForm);
       setEditingId(null);
     } catch (err) {
-      setError(`${err.status || ''} ${err.message}`.trim());
+      setError(BUGS.genericErrorMessages ? 'Server error. Please try again.' : `${err.status || ''} ${err.message}`.trim());
+    } finally {
+      if (!BUGS.allowDuplicateSubmit) {
+        setIsSubmitting(false);
+      }
     }
   }
 
@@ -96,13 +115,14 @@ export default function JobTracker() {
       setJobs((currentJobs) => currentJobs.filter((job) => job.id !== result.deletedJob.id));
       setMessage('Job was deleted.');
     } catch (err) {
-      setError(`${err.status || ''} ${err.message}`.trim());
+      setError(BUGS.genericErrorMessages ? 'Server error. Please try again.' : `${err.status || ''} ${err.message}`.trim());
     }
   }
 
   async function handleExport() {
     setMessage('');
     setError('');
+    setIsExporting(true);
 
     try {
       const result = await exportJobs();
@@ -110,9 +130,13 @@ export default function JobTracker() {
     } catch (err) {
       if (BUGS.exportShowsSuccessEvenWhenApiFails) {
         setMessage('Export created successfully.');
-        return;
+      } else {
+        setError(BUGS.genericErrorMessages ? 'Server error. Please try again.' : `${err.status || ''} ${err.message}`.trim());
       }
-      setError(`${err.status || ''} ${err.message}`.trim());
+    } finally {
+      if (!BUGS.exportSpinnerNeverStops) {
+        setIsExporting(false);
+      }
     }
   }
 
@@ -123,8 +147,8 @@ export default function JobTracker() {
     setMessage('Help is not available yet. Check the Console tab.');
   }
 
-  const visibleJobs = useMemo(() => {
-    return jobs.filter((job) => {
+  const filteredAndSortedJobs = useMemo(() => {
+    const filtered = jobs.filter((job) => {
       const searchSource = `${job.company} ${job.role}`;
       const fixedSearchSource = searchSource.toLowerCase();
       const fixedSearchText = searchText.toLowerCase();
@@ -140,10 +164,27 @@ export default function JobTracker() {
 
       return matchesSearch && matchesStatus;
     });
-  }, [jobs, searchText, statusFilter]);
+
+    const effectiveDirection = BUGS.sortIgnoresDirection ? 'oldest' : sortDirection;
+    filtered.sort((a, b) =>
+      effectiveDirection === 'newest'
+        ? b.dateApplied.localeCompare(a.dateApplied)
+        : a.dateApplied.localeCompare(b.dateApplied)
+    );
+
+    return filtered;
+  }, [jobs, searchText, statusFilter, sortDirection]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredAndSortedJobs.length / PAGE_SIZE));
+
+  const visibleJobs = useMemo(() => {
+    const effectivePage = BUGS.paginationAlwaysShowsFirstPage ? 1 : currentPage;
+    const start = (effectivePage - 1) * PAGE_SIZE;
+    return filteredAndSortedJobs.slice(start, start + PAGE_SIZE);
+  }, [filteredAndSortedJobs, currentPage]);
 
   return (
-    <section className="page-grid">
+    <section className="page-grid" style={BUGS.layoutBreaksOnMobile ? { minWidth: 900 } : {}}>
       <div className="card">
         <div className="section-heading">
           <div>
@@ -213,7 +254,12 @@ export default function JobTracker() {
           {message && <div className="notice success">{message}</div>}
           {error && <div className="notice error">{error}</div>}
 
-          <button type="submit">{editingId ? 'Save Changes' : 'Add Job'}</button>
+          <button
+            type="submit"
+            disabled={!BUGS.allowDuplicateSubmit && isSubmitting}
+          >
+            {editingId ? 'Save Changes' : 'Add Job'}
+          </button>
         </form>
       </div>
 
@@ -224,8 +270,13 @@ export default function JobTracker() {
             <h2>Applications</h2>
           </div>
           <div className="button-row">
-            <button type="button" className="secondary-button" onClick={handleExport}>
-              Export CSV
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={handleExport}
+              disabled={isExporting}
+            >
+              {isExporting ? 'Exporting...' : 'Export CSV'}
             </button>
             <button type="button" className="secondary-button" onClick={handleHelpClick}>
               Help
@@ -236,7 +287,10 @@ export default function JobTracker() {
         <div className="filters">
           <input
             value={searchText}
-            onChange={(event) => setSearchText(event.target.value)}
+            onChange={(event) => {
+              setSearchText(event.target.value);
+              if (BUGS.regressionFilterBreaks) setStatusFilter('All');
+            }}
             placeholder="Search company or role"
             aria-label="Search jobs"
           />
@@ -253,6 +307,15 @@ export default function JobTracker() {
               </option>
             ))}
           </select>
+
+          <select
+            value={sortDirection}
+            onChange={(event) => setSortDirection(event.target.value)}
+            aria-label="Sort by date"
+          >
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+          </select>
         </div>
 
         {isLoading ? (
@@ -260,31 +323,57 @@ export default function JobTracker() {
         ) : visibleJobs.length === 0 ? (
           <p className="empty-state">No jobs match the current filters.</p>
         ) : (
-          <div className="job-list">
-            {visibleJobs.map((job) => (
-              <article key={job.id} className="job-card">
-                <div>
-                  <h3>{job.company || '(No company name)'}</h3>
-                  <p>{job.role}</p>
-                  <span className="status-pill">{job.status}</span>
-                </div>
+          <>
+            <div className="job-list">
+              {visibleJobs.map((job) => (
+                <article key={job.id} className="job-card">
+                  <div>
+                    <h3>{job.company || '(No company name)'}</h3>
+                    <p>{job.role}</p>
+                    <span className="status-pill">{job.status}</span>
+                  </div>
 
-                <div>
-                  <p className="muted-text">Applied: {job.dateApplied}</p>
-                  <p>{job.notes || 'No notes yet.'}</p>
-                </div>
+                  <div>
+                    <p className="muted-text">Applied: {job.dateApplied}</p>
+                    <p>{job.notes || 'No notes yet.'}</p>
+                  </div>
 
-                <div className="button-row">
-                  <button type="button" className="secondary-button" onClick={() => handleEdit(job)}>
-                    Edit
-                  </button>
-                  <button type="button" className="danger-button" onClick={() => handleDelete(job.id)}>
-                    Delete
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
+                  <div className="button-row">
+                    <button type="button" className="secondary-button" onClick={() => handleEdit(job)}>
+                      Edit
+                    </button>
+                    <button type="button" className="danger-button" onClick={() => handleDelete(job.id)}>
+                      Delete
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                >
+                  ← Previous
+                </button>
+                <span className="pagination-info">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next →
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </section>
