@@ -1,11 +1,12 @@
 $kind: http-request
+name: Invalid Email - Missing username in email
 url: http://localhost:3001/api/login
 method: POST
 body:
   type: json
   content: |-
     {
-        "email": "halle@example.com",
+        "email": "@example.com",
         "password": "Password123!"
     }
-order: 4358800321174191
+order: 4360822868704854
