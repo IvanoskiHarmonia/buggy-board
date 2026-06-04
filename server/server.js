@@ -36,7 +36,7 @@ function isBlank(value) {
 // Simple: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 // More comprehensive: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 function isValidEmail(email) {
-	const regex = /^[^\s@]+@[a-zA-Z]{3,}\.(com|edu|org)$/;
+	const regex = /^[^\s@]{3,}@[a-zA-Z]{3,}\.(com|edu|org)$/;
 	return regex.test(email);
 }
 
@@ -65,7 +65,8 @@ app.post("/api/login", async (req, res) => {
 	if (!email || !isValidEmail(email)) {
 		return res.status(400).json({
 			message:
-				"Email must be valid (have <name> before @) and include @. Must contain at least 3 characters before the domain and end with .com, .edu, or .org",
+				"Email must be valid username (at least 3 characters) followed by @, " +
+				"contain at least 3 characters for domain name and end with .com, .edu, or .org domain extension.",
 		});
 	}
 
