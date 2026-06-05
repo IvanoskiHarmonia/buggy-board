@@ -1,0 +1,15 @@
+$kind: http-request
+name: No company
+url: http://localhost:3001/api/jobs
+method: POST
+body:
+  type: json
+  content: |-
+    {
+        "company": "",
+        "role": "Leasing Agent",
+        "status": "Offer",
+        "dateApplied": "2026-06-05",
+        "notes": ""
+    }
+order: 3061351847349600

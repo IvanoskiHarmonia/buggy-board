@@ -1,0 +1,15 @@
+$kind: http-request
+name: No role request
+url: http://localhost:3001/api/jobs
+method: POST
+body:
+  type: json
+  content: |-
+    {
+        "company": "Camden",
+        "role": "",
+        "status": "Offer",
+        "dateApplied": "2026-06-05",
+        "notes": ""
+    }
+order: 1664823314458098

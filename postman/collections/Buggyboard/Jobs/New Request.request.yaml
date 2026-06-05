@@ -1,0 +1,15 @@
+$kind: http-request
+name: New Request
+url: http://localhost:3001/api/jobs/job-1?id=true&company=true&role=true
+method: GET
+queryParams:
+  - key: id
+    value: "true"
+  - key: company
+    value: "true"
+  - key: role
+    value: "true"
+body:
+  type: json
+  content: ""
+order: 3434380248613477

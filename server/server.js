@@ -98,6 +98,30 @@ app.get("/api/jobs", async (req, res) => {
 	res.json(db.jobs);
 });
 
+app.get("/api/jobs/:id", async (req, res) => {
+	await wait(250);
+
+	const db = await readDb();
+	const job = db.jobs.find((job) => job.id === req.params.id);
+
+	if (!job) {
+		return res.status(404).json({ message: "Job not found." });
+	}
+
+	const { id, company, role, status, dateApplied, notes } = req.query;
+
+	const ret = {
+		id: id == "true" ? job.id : "",
+		company: company == "true" ? job.company : "",
+		role: role == "true" ? job.role : "",
+		status: status == "true" ? job.status : "",
+		dateApplied: dateApplied == "true" ? job.dateApplied : new Date().toISOString().slice(0, 10),
+		notes: notes == "true" ? job.notes : "",
+	};
+
+	res.json(ret);
+});
+
 app.post("/api/jobs", async (req, res) => {
 	await wait(350);
 

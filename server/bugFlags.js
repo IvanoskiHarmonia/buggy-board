@@ -1,5 +1,5 @@
 export const BUGS = {
-	allowBlankCompany: true,
+	allowBlankCompany: false,
 	deleteWrongJob: true,
 	loginAcceptsVeryShortPassword: false,
 	rejectedReportUsesOfferCount: true,

@@ -8,6 +8,22 @@
   },
   "jobs": [
     {
+      "id": "cf7d9077-e5ff-4533-b432-f953e12704cf",
+      "company": "Camden",
+      "role": "Leasing Agent",
+      "status": "Offer",
+      "dateApplied": "2026-06-05",
+      "notes": ""
+    },
+    {
+      "id": "23c1ecf9-8150-47c3-b89b-9d8b1c4ebc5c",
+      "company": "Camden",
+      "role": "Leasing Agent",
+      "status": "Offer",
+      "dateApplied": "2026-06-05",
+      "notes": ""
+    },
+    {
       "id": "8738e472-b396-4c5e-b4e0-9dde40a1ad2f",
       "company": "LinkedIn",
       "role": "Manual QA Tester",

@@ -1,0 +1,5 @@
+$kind: http-request
+name: Get profile
+url: http://localhost:3001/api/profile
+method: GET
+order: 1780629459711
