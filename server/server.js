@@ -65,8 +65,7 @@ app.post("/api/login", async (req, res) => {
 	if (!email || !isValidEmail(email)) {
 		return res.status(400).json({
 			message:
-				"Email must be valid username (at least 3 characters) followed by @, " +
-				"contain at least 3 characters for domain name and end with .com, .edu, or .org domain extension.",
+				"Email must be valid username (at least 3 characters) followed by @, contain at least 3 characters for domain name and end with .com, .edu, or .org domain extension.",
 		});
 	}
 
