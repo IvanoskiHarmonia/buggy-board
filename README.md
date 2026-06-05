@@ -109,6 +109,18 @@ Open the frontend URL Vite prints, usually:
 http://localhost:5173
 ```
 
+### Bash script way to run the app
+
+To run the bash script you will need the following:
+
+```bash
+# only for first time. otherwise you will get: zsh: permission denied: ./start_sc.sh 
+chmod +x start_sc.sh 
+
+# run this command 
+./start_sc.sh # sc means Server & Client
+```
+
 ## Demo login
 
 Use:
@@ -181,4 +193,3 @@ qa-materials/bug-answer-key.md
 ```
 
 Do not give that file to the learner first. Use it as the teacher answer key.
-# buggyboard
